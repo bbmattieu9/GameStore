@@ -29,7 +29,6 @@ List<GameDto> games = [
         new DateOnly(1995, 9,  20))
 ];
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -37,9 +36,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// app.MapGet("/", () => "Hello World!");
-
 app.MapGet("/games", () => Results.Ok(games));
+
+// Get a game by id
+app.MapGet("/games/{id}", (int id) => {
+    var game = games.FirstOrDefault(g => g.Id == id);
+    return game != null ? Results.Ok(game) : Results.NotFound();
+});
+
+// POST /games
+app.MapPost("/games", (CreateGameDto newGame) =>
+{
+    GameDto game = new GameDto(
+        games.Count + 1,
+        newGame.Name,
+        newGame.Genre,
+        newGame.Price,
+        newGame.ReleaseDate);
+});
 
 app.Run();
 
