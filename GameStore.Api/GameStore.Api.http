@@ -4,6 +4,6 @@
 GET {{HostAddress}}/games
 Accept: application/json
 
-
-
 ###
+
+GET {{HostAddress}}/games/1
