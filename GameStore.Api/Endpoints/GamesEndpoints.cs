@@ -25,20 +25,22 @@ public static class GamesEndpoints
             69.30M,
             new DateOnly(1995, 9,  20))
     ];
-
-
+    
     public static void MapGamesEndpoint(this WebApplication app)
     {
-        app.MapGet("/games", () => Results.Ok(games));
+        var group = app.MapGroup("/games");
+        
+        group.MapGet("/", () => Results.Ok(games));
 
-        app.MapGet("/games/{id}", (int id) =>
+        group.MapGet("/{id}", (int id) =>
         {
             var game = games.FirstOrDefault(game => game.Id == id);
             return game is not null ? Results.Ok(game) : Results.NotFound();
         }).WithName(GetGameEndpointName);
 
-        app.MapPost("/games", (CreateGameDto newGame) =>
+        group.MapPost("/games", (CreateGameDto newGame) =>
         {
+           
             var game = new GameDto(
                 games.Count + 1,
                 newGame.Name,
@@ -51,7 +53,7 @@ public static class GamesEndpoints
             return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game);
         });
 
-        app.MapPut("/games/{id}", (int id, UpdateGameDto updateGame) =>
+        group.MapPut("/{id}", (int id, UpdateGameDto updateGame) =>
         {
             var index = games.FindIndex(game => game.Id == id);
             if (index == -1)
@@ -69,7 +71,7 @@ public static class GamesEndpoints
             return Results.NoContent();
         });
 
-        app.MapDelete("/games/{id}", (int id) =>
+        group.MapDelete("/{id}", (int id) =>
         {
             var removedCount = games.RemoveAll(game => game.Id == id);
             return removedCount > 0 ? Results.NoContent() : Results.NotFound();
