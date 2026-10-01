@@ -1,6 +1,7 @@
 using GameStore.Api.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddValidation();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
