@@ -1,7 +1,5 @@
 using GameStore.Api.Dtos;
 
-namespace GameStore.Api.Endpoints;
-
 public static class GamesEndpoints
 {
     const string GetGameEndpointName = "GetGame";
