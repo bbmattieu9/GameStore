@@ -1,4 +1,4 @@
-namespace GameStore.Api.Endpoints;
+namespace GameStore.Api.Models;
 
 public class Game
 {
