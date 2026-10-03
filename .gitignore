@@ -239,6 +239,10 @@ _pkginfo.txt
 
 # Others
 ClientBin/
+GameStore.Api/GameStore.db
+GameStore.Api/GameStore.db-shm
+GameStore.Api/GameStore.db-wal
+GameStore.Api/GameStore.db-journal
 ~$*
 *~
 *.dbmdl
