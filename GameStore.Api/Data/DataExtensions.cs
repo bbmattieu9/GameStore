@@ -1,3 +1,4 @@
+using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Data;
@@ -9,5 +10,28 @@ public static class DataExtensions
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
         context.Database.Migrate();
+    }
+
+    public static void AddGameStoreDb(this WebApplicationBuilder builder)
+    {
+        const string connectionString = "Data Source=GameStore.db";
+
+        builder.Services.AddDbContext<GameStoreContext>(options =>
+            options.UseSqlite(connectionString)
+                .UseSeeding((context, _) =>
+                {
+                    if (!context.Set<Genre>().Any())
+                    {
+                        context.Set<Genre>().AddRange(
+                            new Genre { Name = "Fighting" },
+                            new Genre { Name = "RPG" },
+                            new Genre { Name = "Platformer" },
+                            new Genre { Name = "Racing" },
+                            new Genre { Name = "Sports" }
+                        );
+
+                        context.SaveChanges();
+                    }
+                }));
     }
 }
