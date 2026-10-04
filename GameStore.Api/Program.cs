@@ -2,13 +2,11 @@
 
 using GameStore.Api.Data;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddValidation();
+builder.AddGameStoreDb();
 
-var connString = "Data Source=GameStore.db";
-builder.Services.AddSqlite<GameStoreContext>(connString);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -27,5 +25,4 @@ app.MapGamesEndpoint();
 app.MigrateDb();
 
 app.Run();
-
 
