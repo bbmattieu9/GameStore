@@ -1,4 +1,6 @@
 using GameStore.Api.Dtos;
+using GameStore.Api.Data;
+using GameStore.Api.Models;
 
 public static class GamesEndpoints
 {
@@ -36,19 +38,29 @@ public static class GamesEndpoints
             return game is not null ? Results.Ok(game) : Results.NotFound();
         }).WithName(GetGameEndpointName);
 
-        group.MapPost("/games", (CreateGameDto newGame) =>
+        group.MapPost("/games", (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
-           
-            var game = new GameDto(
-                games.Count + 1,
-                newGame.Name,
-                newGame.Genre,
-                newGame.Price,
-                newGame.ReleaseDate);
 
-            games.Add(game);
+            Game game = new Game
+            {
+                Name = newGame.Name,
+                GenreId = newGame.GenreId,
+                Price = newGame.Price,
+                ReleaseDate = newGame.ReleaseDate
+            };
 
-            return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game);
+            dbContext.Games.Add(game);
+            dbContext.SaveChanges();
+
+            GameDetailsDto gameDto = new GameDetailsDto(
+                game.GameId,
+                game.Name,
+                game.GenreId,
+                game.Price,
+                game.ReleaseDate
+            );
+
+            return Results.CreatedAtRoute(GetGameEndpointName, new { id = gameDto.Id }, gameDto);
         });
 
         group.MapPut("/{id}", (int id, UpdateGameDto updateGame) =>
