@@ -38,7 +38,7 @@ public static class GamesEndpoints
             return game is not null ? Results.Ok(game) : Results.NotFound();
         }).WithName(GetGameEndpointName);
 
-        group.MapPost("/games", (CreateGameDto newGame, GameStoreContext dbContext) =>
+        group.MapPost("/", (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
 
             Game game = new Game
