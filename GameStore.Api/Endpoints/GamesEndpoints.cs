@@ -1,11 +1,12 @@
 using GameStore.Api.Dtos;
 using GameStore.Api.Data;
 using GameStore.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 public static class GamesEndpoints
 {
     const string GetGameEndpointName = "GetGame";
-    private static readonly List<GameDto> games = [
+    private static readonly List<GameSummaryDto> games = [
         new (1, 
             "Street Fighter II", 
             "Fighting", 
@@ -30,15 +31,33 @@ public static class GamesEndpoints
     {
         var group = app.MapGroup("/games");
         
-        group.MapGet("/", () => Results.Ok(games));
+        group.MapGet("/", async(GameStoreContext dbContext) => 
+        
+            await dbContext.Games
+            .Include(game => game.Genre)
+            .Select(game => new GameSummaryDto(
+                game.GameId,
+                game.Name,
+                game.Genre!.Name,
+                game.Price,
+                game.ReleaseDate
+            ))
+            .AsNoTracking()
+            .ToListAsync());
 
-        group.MapGet("/{id}", (int id) =>
+        group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
         {
-            var game = games.FirstOrDefault(game => game.Id == id);
-            return game is not null ? Results.Ok(game) : Results.NotFound();
+            var game = await dbContext.Games.FindAsync(id);
+            return game is null ?  Results.NotFound() : Results.Ok(new GameDetailsDto(
+                game.GameId,
+                game.Name,
+                game.GenreId,
+                game.Price,
+                game.ReleaseDate
+            ));
         }).WithName(GetGameEndpointName);
 
-        group.MapPost("/", (CreateGameDto newGame, GameStoreContext dbContext) =>
+        group.MapPost("/", async (CreateGameDto newGame, GameStoreContext dbContext) =>
         {
 
             Game game = new Game
@@ -50,7 +69,7 @@ public static class GamesEndpoints
             };
 
             dbContext.Games.Add(game);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             GameDetailsDto gameDto = new GameDetailsDto(
                 game.GameId,
@@ -71,7 +90,7 @@ public static class GamesEndpoints
                 return Results.NotFound();
             }
 
-            games[index] = new GameDto(
+            games[index] = new GameSummaryDto(
                 id,
                 updateGame.Name,
                 updateGame.Genre,
