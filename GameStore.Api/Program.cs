@@ -1,6 +1,7 @@
 
 
 using GameStore.Api.Data;
+using GameStore.Api.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ var app = builder.Build();
 
 // app.UseHttpsRedirection();
 app.MapGamesEndpoint();
+app.MapGenreEndpoints();
 
 app.MigrateDb();
 

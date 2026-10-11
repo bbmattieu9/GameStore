@@ -35,3 +35,5 @@ Content-Type: application/json
 
 ###
 DELETE {{HostAddress}}/games/1
+
+GET {{HostAddress}}/genres
